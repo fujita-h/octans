@@ -29,7 +29,7 @@ export default function SidebarLayout({ user, children }: { user: User; children
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-900/80" />
+            <div className="fixed inset-0 bg-neutral-900/50" />
           </Transition.Child>
 
           <div className="fixed inset-0 flex">
