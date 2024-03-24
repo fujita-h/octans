@@ -1,12 +1,17 @@
-import { auth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth';
+import ThemeSwitch from '@/components/theme-switch';
+import { auth } from '@/lib/auth';
 
 export default async function Page() {
   const session = await auth();
 
-  if (!session) {
+  if (!session || !session.user) {
     return <LoginForm />;
   }
 
-  return <p>Welcome to Octans!</p>;
+  return (
+    <div>
+      <ThemeSwitch />
+    </div>
+  );
 }
