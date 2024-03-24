@@ -17,8 +17,9 @@ export default function SidebarLayout({ user, children }: { user: User; children
 
   return (
     <div>
+      {/* Sidebar for small desktop and mobile, overlay when opened */}
       <Transition.Root show={sidebarOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
+        <Dialog as="div" className="relative z-[5] lg:hidden" onClose={setSidebarOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -68,13 +69,14 @@ export default function SidebarLayout({ user, children }: { user: User; children
         </Dialog>
       </Transition.Root>
 
-      {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+      {/* Static sidebar for large desktop */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <SidebarContent user={user} />
       </div>
 
-      <div className="sticky top-0 z-40 flex items-center gap-x-6 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+      {/* Top navbar for small desktop and mobile */}
+      <div className="sticky top-0 flex items-center gap-x-6 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
         <button type="button" className="-m-2.5 p-2.5 lg:hidden" onClick={() => setSidebarOpen(true)}>
           <span className="sr-only">Open sidebar</span>
           <Bars3Icon className="h-6 w-6" aria-hidden="true" />
@@ -82,6 +84,7 @@ export default function SidebarLayout({ user, children }: { user: User; children
         <>nabvar</>
       </div>
 
+      {/* Main content */}
       <main className="py-10 lg:pl-64">
         <div className="px-4 sm:px-6 lg:px-8">{children}</div>
       </main>
@@ -142,7 +145,7 @@ function ProfileButtonMenu({ user }: { user: User }) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute bottom-14 z-10 mt-2 px-1 w-[232px] origin-bottom-left divide-y divide-gray-100 dark:divide-neutral-700 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black dark:ring-neutral-700 ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute bottom-14 z-[5] mt-2 px-1 w-[232px] origin-bottom-left divide-y divide-gray-100 dark:divide-neutral-700 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black dark:ring-neutral-700 ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
               {({ active }) => (
