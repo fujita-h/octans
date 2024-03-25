@@ -1,5 +1,6 @@
 'use client';
 
+import SettingDialog from '@/components/dialogs/settings';
 import type { User } from '@auth/core/types';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -119,6 +120,7 @@ function SidebarContent({ user }: { user: User }) {
 }
 
 function ProfileButtonMenu({ user }: { user: User }) {
+  const [openSettingDialog, setOpenSettingDialog] = useState(false);
   return (
     <Menu as="div" className="relative inline-block text-left w-full">
       <div>
@@ -176,6 +178,7 @@ function ProfileButtonMenu({ user }: { user: User }) {
                       : 'text-gray-700 dark:text-white',
                     'group flex items-center w-full px-4 py-2 text-sm rounded-md'
                   )}
+                  onClick={() => setOpenSettingDialog(true)}
                 >
                   <IoSettingsOutline
                     className="mr-3 h-5 w-5 text-gray-500 dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-100"
@@ -209,6 +212,7 @@ function ProfileButtonMenu({ user }: { user: User }) {
           </div>
         </Menu.Items>
       </Transition>
+      <SettingDialog open={openSettingDialog} setOpen={setOpenSettingDialog} />
     </Menu>
   );
 }
