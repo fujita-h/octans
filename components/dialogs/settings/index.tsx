@@ -67,7 +67,7 @@ export default function SettingDialog({ open, setOpen }: { open: boolean; setOpe
                     <nav className="flex-none px-4 sm:px-6 lg:px-0">
                       <ul role="list" className="flex gap-x-3 gap-y-1 whitespace-nowrap lg:flex-col">
                         {categories.map((item) => (
-                          <li key={item.name}>
+                          <li key={item.id}>
                             <span
                               className={clsx(
                                 item.id === currentCategory.id
