@@ -70,25 +70,22 @@ export default function SidebarLayout({ user, children }: { user: User; children
         </Dialog>
       </Transition.Root>
 
+      {/* Open sidebar button for small desktop and mobile */}
+      <div className="absolute top-2 left-3 z-[5] lg:hidden">
+        <button type="button" className="-m-2.5 p-2.5 lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <span className="sr-only">Open sidebar</span>
+          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+        </button>
+      </div>
+
       {/* Static sidebar for large desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <SidebarContent user={user} />
       </div>
 
-      {/* Top navbar for small desktop and mobile */}
-      <div className="sticky top-0 flex items-center gap-x-6 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
-        <button type="button" className="-m-2.5 p-2.5 lg:hidden" onClick={() => setSidebarOpen(true)}>
-          <span className="sr-only">Open sidebar</span>
-          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-        </button>
-        <>nabvar</>
-      </div>
-
       {/* Main content */}
-      <main className="py-10 lg:pl-64">
-        <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-      </main>
+      <main className="lg:pl-64 h-[100vh] bg-white dark:bg-neutral-800">{children}</main>
     </div>
   );
 }
