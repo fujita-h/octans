@@ -1,7 +1,6 @@
 import { LoginForm } from '@/components/auth';
-import ThemeSwitch from '@/components/theme-switch';
 import { auth } from '@/lib/auth';
-
+import Chat from './form';
 export default async function Page() {
   const session = await auth();
 
@@ -9,9 +8,5 @@ export default async function Page() {
     return <LoginForm />;
   }
 
-  return (
-    <div>
-      <ThemeSwitch />
-    </div>
-  );
+  return <Chat />;
 }
