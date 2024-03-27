@@ -7,11 +7,10 @@ services:
       dockerfile: Dockerfile
 
     volumes:
-      - ..:/workspace:cached
+      - ../..:/workspaces:cached
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
-
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
@@ -24,7 +23,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
-
     # Use "network_mode: service:app" to share the network stack with the app container.
     # This means you can connect to PostgreSQL from the app container using "localhost".
     # Be sure to update the connection string to use "localhost".
