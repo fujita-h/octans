@@ -5,7 +5,7 @@ import clsx from 'clsx/lite';
 import { useState } from 'react';
 import type { AI } from './action';
 
-import scrollbarStyles from '../scrollbar.module.css';
+import scrollbarStyles from '../../scrollbar.module.css';
 
 export default function Form() {
   const [inputValue, setInputValue] = useState('');
