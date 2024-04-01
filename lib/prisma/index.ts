@@ -1,1 +1,1 @@
-export { default } from './instance';
+export { default, Prisma } from './instance';

@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { SWRProvider } from '@/components/providers/swr-provider';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -20,7 +21,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
+          <SWRProvider>{children}</SWRProvider>
         </ThemeProvider>
       </body>
     </html>

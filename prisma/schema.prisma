@@ -73,6 +73,8 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
+  conversations Conversation[]
+
   @@map("user")
 }
 
@@ -88,4 +90,30 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_token")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User  @relation(fields: [userId], references: [id])
+  chat Chat?
+
+  @@map("conversation")
+}
+
+model Chat {
+  id        String   @id @default(cuid()) // same as conversation id
+  filePath  String?  @map("file_path")
+  blobPath  String?  @map("blob_path")
+  jsonData  Json?    @map("json_data")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  conversation Conversation @relation(fields: [id], references: [id])
+
+  @@map("chat")
 }
