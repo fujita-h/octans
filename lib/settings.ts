@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import yaml from 'yaml';
-import { type ChatModel } from '@/types/chat';
+import { ChatModelIdentifier, type ChatModelDefinition } from '@/types/chat';
 
 // Load the settings.yml file
 const file = fs.readFileSync(process.cwd() + '/settings.yml', 'utf8');
@@ -10,13 +10,13 @@ const settingsRaw = yaml.parse(file);
 
 // Chat settings
 function chatDefaultSystemPrompt() {
-  const defaultPrompt = settingsRaw.chat.default.system_prompt;
-  if (!defaultPrompt || typeof defaultPrompt !== 'string') {
+  const defaultSystemPrompt = settingsRaw.chat.default.system_prompt;
+  if (!defaultSystemPrompt || typeof defaultSystemPrompt !== 'string') {
     return undefined;
   }
-  return defaultPrompt;
+  return defaultSystemPrompt;
 }
-function chatDefaultChatModelInfo() {
+function chatDefaultChatModelInfo(): ChatModelIdentifier | undefined {
   const defaultModel = settingsRaw.chat.default.model;
   if (!defaultModel) {
     return undefined;
@@ -27,27 +27,38 @@ function chatDefaultChatModelInfo() {
   }
   return {
     provider,
-    model,
+    name: model,
   };
 }
-function chatModelsArray(): ChatModel[] {
+function chatModelsArray(): ChatModelDefinition[] {
   return Object.entries(settingsRaw.chat.llms)
     .map(([key, value]) => {
       const providerName = key;
-      const v = value as any;
-      return Object.entries(v.models).map(([key, value]) => {
+      // Convert models object to array
+      return Object.entries((value as any).models).map(([key, value]) => {
         const modelName = key;
         const v = value as any;
         return {
-          provider: providerName,
-          model: modelName,
           ...v,
+          name: modelName,
+          provider: providerName,
+          display_name: v.display_name,
+          description: v.description,
+          system_prompt: v.system_prompt,
+          token_limit: v.token_limit,
+          allowed_roles: v.allowed_roles,
+          variables: Object.entries(v.variables).map(([key, value]) => {
+            return {
+              ...(value as any),
+              name: key,
+            };
+          }),
         };
       });
     })
-    .flat();
+    .flat(1);
 }
-export const settingsChatRaw = settingsRaw.chat;
+export const settingsChatRaw: any = settingsRaw.chat;
 export const settingsChatDefaultSystemPrompt = chatDefaultSystemPrompt();
 export const settingsChatDefaultModelInfo = chatDefaultChatModelInfo();
 export const settingsChatModels = chatModelsArray();

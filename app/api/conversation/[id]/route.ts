@@ -2,6 +2,7 @@
 
 import prisma, { Prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { ChatData } from '@/types/chat';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
@@ -24,7 +25,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   const userId = session?.user?.id;
-  const reqData = await req.json();
+  const data = await req.json();
 
   if (!userId) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -38,11 +39,27 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return Response.json({ error: 'Conversation not found' }, { status: 404 });
   }
 
-  const data = await prisma.conversation.update({
+  // apply type assertion to ChatData
+  const chatData: ChatData = {
+    id: params.id,
+    provider: data.provider,
+    name: data.name,
+    params: data.params,
+    messages: data.messages,
+  };
+
+  const result = await prisma.conversation.update({
     where: { id: params.id },
-    data: { chat: { upsert: { create: { jsonData: reqData }, update: { jsonData: reqData } } } },
+    data: {
+      chat: {
+        upsert: {
+          create: { jsonData: chatData as any },
+          update: { jsonData: chatData as any },
+        },
+      },
+    },
     include: { chat: true },
   });
 
-  return Response.json({ ...data, id: params.id });
+  return Response.json({ ...result, id: params.id });
 }

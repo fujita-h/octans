@@ -1,23 +1,44 @@
 import type { Message } from 'ai';
 
-export type ChatModel = {
+export type ChatModelDefinition = {
+  name: string;
   provider: string;
-  model: string;
-  name?: string;
-  description?: string;
+  display_name: string;
+  description: string;
   system_prompt?: string;
   token_limit: number;
   allowed_roles: string[];
-  variables: any;
+  variables: ChatModelVariable[];
   [key: string]: any;
 };
 
-export type ChatModelInfo = Pick<
-  ChatModel,
-  'provider' | 'model' | 'name' | 'description' | 'system_prompt' | 'variables'
+export type ChatModel = Pick<
+  ChatModelDefinition,
+  'provider' | 'name' | 'display_name' | 'description' | 'system_prompt' | 'variables'
 > & {
   default?: boolean;
 };
-export type ChatModelData = Pick<ChatModel, 'provider' | 'model' | 'variables'>;
-export type ChatMessageData = { id?: string; messages: Message[] };
-export type ChatData = ChatModelData & ChatMessageData;
+export type ChatModelIdentifier = Pick<ChatModelDefinition, 'provider' | 'name'>;
+export type ChatModelInfo = Pick<ChatModelDefinition, 'provider' | 'name' | 'display_name' | 'description'>;
+export type ChatModelData = ChatModelIdentifier & { params: ChatModelParams };
+
+// ChatModelVariable types
+export type ChatModelVariable = {
+  name: string;
+  type: string;
+  default: any;
+  value?: any;
+  [key: string]: any;
+};
+
+// ChatModelParam types
+export type ChatModelParam = {
+  name: string;
+  type: string;
+  value: any;
+};
+export type ChatModelParams = ChatModelParam[];
+
+// ChatMessage and ChatData types
+export type ChatMessages = Message[];
+export type ChatData = { id?: string } & ChatModelData & { messages: ChatMessages };

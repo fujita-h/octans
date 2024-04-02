@@ -11,96 +11,86 @@ chat:
         key: OPENAI_API_KEY
       models:
         gpt-3.5-turbo:
-          name: "GPT-3.5"
+          display_name: "GPT-3.5"
           description: "あらゆるタスクに最適"
           # system_prompt: "Use Japanese default. Use Markdown for text decoration and code examples."
           token_limit: 4096
           allowed_roles: []
           variables:
             max_token:
+              type: range
               default: 500
-              customize:
-                type: range
-                min: 0
-                max: 4000
-                step: 200
+              min: 0
+              max: 4000
+              step: 200
             temperature:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 2.0
-                step: 0.1
+              min: 0.0
+              max: 2.0
+              step: 0.1
             top_p:
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 1.0
-                step: 0.1
+              type: range
+              min: 0.0
+              max: 1.0
+              step: 0.1
             frequency_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             presence_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             stream:
               defaut: true
         gpt-4-0125-preview:
-          name: "GPT-4-Turbo"
+          display_name: "GPT-4-Turbo"
           description: "あらゆるタスクに最適"
           token_limit: 128000
           allowed_roles: []
           variables:
             max_token:
+              type: range
               default: 500
-              customize:
-                type: range
-                min: 0
-                max: 4000
-                step: 200
+              min: 0
+              max: 4000
+              step: 200
             temperature:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 2.0
-                step: 0.1
+              min: 0.0
+              max: 2.0
+              step: 0.1
             top_p:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 1.0
-                step: 0.1
+              min: 0.0
+              max: 1.0
+              step: 0.1
             frequency_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             presence_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             stream:
               defaut: true
     azure_openai:
       models:
         gpt-3.5-turbo:
-          name: "GPT-3.5"
+          display_name: "GPT-3.5"
           description: "あらゆるタスクに最適"
           token_limit: 4096
           allowed_roles: ["Test.Test", "aa"]
@@ -110,44 +100,39 @@ chat:
             key: AZURE_OPENAI_API_KEY
           variables:
             max_token:
+              type: range
               default: 500
-              customize:
-                type: range
-                min: 0
-                max: 4000
-                step: 200
+              min: 0
+              max: 4000
+              step: 200
             temperature:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 2.0
-                step: 0.1
+              min: 0.0
+              max: 2.0
+              step: 0.1
             top_p:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 1.0
-                step: 0.1
+              min: 0.0
+              max: 1.0
+              step: 0.1
             frequency_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             presence_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             stream:
               defaut: true
         gpt-4:
-          name: "GPT-4"
+          display_name: "GPT-4"
           description: "難しいタスクに最適"
           token_limit: 8192
           allowed_roles: []
@@ -157,39 +142,34 @@ chat:
             key: AZURE_OPENAI_API_KEY
           variables:
             max_token:
+              type: range
               default: 500
-              customize:
-                type: range
-                min: 0
-                max: 8000
-                step: 200
+              min: 0
+              max: 8000
+              step: 200
             temperature:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 2.0
-                step: 0.1
+              min: 0.0
+              max: 2.0
+              step: 0.1
             top_p:
+              type: range
               default: 1.0
-              customize:
-                type: range
-                min: 0.0
-                max: 1.0
-                step: 0.1
+              min: 0.0
+              max: 1.0
+              step: 0.1
             frequency_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             presence_penalty:
+              type: range
               default: 0.0
-              customize:
-                type: range
-                min: -2.0
-                max: 2.0
-                step: 0.1
+              min: -2.0
+              max: 2.0
+              step: 0.1
             stream:
               defaut: true
