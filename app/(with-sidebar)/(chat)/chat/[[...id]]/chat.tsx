@@ -1,25 +1,24 @@
 'use client';
 
-import { Fragment, useEffect, useState, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { useChat } from 'ai/react';
-import clsx from 'clsx/lite';
-import { Popover, Transition, Menu } from '@headlessui/react';
-import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
-import { nanoid_case_insensitive, nanoid } from '@/lib/nanoid';
+import { nanoid, nanoid_case_insensitive } from '@/lib/nanoid';
 import type {
   ChatData,
-  ChatModel,
   ChatMessages,
-  ChatModelVariable,
-  ChatModelInfo,
+  ChatModel,
   ChatModelIdentifier,
+  ChatModelInfo,
   ChatModelParam,
+  ChatModelVariable,
 } from '@/types/chat';
+import { Menu, Popover, Transition } from '@headlessui/react';
+import { useChat } from 'ai/react';
+import clsx from 'clsx/lite';
+import Link from 'next/link';
+import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import useSWR from 'swr';
 
+import { CheckCircleIcon, ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
 import scrollbarStyles from '../../../scrollbar.module.css';
-import Link from 'next/link';
 
 export function NewChat({
   modelOptions,
@@ -35,7 +34,6 @@ export function NewChat({
     modelOptions.find((model) => provider && name && provider === model.provider && name === model.name) ||
     modelOptions.find((model) => model.default) ||
     modelOptions[0];
-  console.log('defaultModel', model);
 
   // Create a new chat data object based on the selected model
   const newChatData: ChatData = {
@@ -50,8 +48,11 @@ export function NewChat({
       };
     }),
     // Add the system prompt message if it exists
-    messages: model.system_prompt ? [{ id: '', role: 'system', content: model.system_prompt }] : [],
+    messages: model.system_prompt
+      ? [{ id: nanoid_case_insensitive(10), role: 'system', content: model.system_prompt }]
+      : [],
   };
+
   return <ChatFrame modelOptions={modelOptions} chatData={newChatData} />;
 }
 
@@ -81,9 +82,6 @@ export function SavedChat({ id, modelOptions }: { id: string; modelOptions: Chat
 // Separate ModelSelectMenu and Chat components.
 // This is to avoid re-rendering the ModelSelectMenu component when the Chat component re-renders.
 function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chatData: ChatData }) {
-  console.log('chatData', chatData);
-  console.log('modelOptions', modelOptions);
-
   // Generate a key for the Chat component to control the re-mount the component.
   // If the key is changed, the Chat component will re-mount.
   // Note: Chat component have own state, so it will not be affected by the re-rendering.
@@ -105,12 +103,12 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
     });
   };
 
+  // set the chat model based on the chatData
   const model = modelOptions.find((model) => model.provider === chatData.provider && model.name === chatData.name);
 
   // set the variables based on the chatData, if not found, set it to an empty array
   const [variables, setVariables] = useState<ChatModelVariable[]>(model ? initializeVariables(model.variables) : []);
   useEffect(() => {
-    console.log('model changed', model);
     if (!model) {
       setVariables([]);
       return;
@@ -123,9 +121,14 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-none flex items-center justify-center lg:justify-normal px-4 py-1 h-12 max-h-12 border-b border-gray-100">
-        <ModelSelectMenu options={modelOptions} model={model} />
-        <ModelValiablesSetting variables={variables} setVariables={setVariables} />
+      <div className="flex-none flex items-center justify-between lg:justify-between px-4 py-1 h-12 max-h-12 border-b border-gray-100">
+        <div className="block lg:hidden">{/* dummy block */}</div>
+        <div className="flex items-center">
+          <ModelSelectMenu options={modelOptions} model={model} />
+        </div>
+        <div className="flex items-center">
+          <ModelValiablesSetting variables={variables} setVariables={setVariables} />
+        </div>
       </div>
       <Chat
         key={chatKey} // used for re-mount of the Chat component
@@ -166,16 +169,29 @@ function ModelSelectMenu({ options, model }: { options: ChatModelInfo[]; model: 
         <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           {options.map((option, index) => (
             <div key={index} className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href={`/chat?provider=${option.provider}&name=${option.name}`}
-                    className={clsx(active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm')}
-                  >
-                    {option.display_name}
-                  </Link>
-                )}
-              </Menu.Item>
+              {model.provider === option.provider && model.name === option.name ? (
+                <div>
+                  <span className="bg-blue-100 text-gray-900 block px-4 py-2">
+                    <div className="flex gap-2 items-center text-sm font-semibold">
+                      <span>{option.display_name}</span>
+                      <CheckCircleIcon className="h-5 w-5 inline-block text-blue-600" />
+                    </div>
+                    <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
+                  </span>
+                </div>
+              ) : (
+                <Menu.Item>
+                  {({ active }) => (
+                    <Link
+                      href={`/chat?provider=${option.provider}&name=${option.name}`}
+                      className={clsx(active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2')}
+                    >
+                      <div className="text-sm font-semibold">{option.display_name}</div>
+                      <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
+                    </Link>
+                  )}
+                </Menu.Item>
+              )}
             </div>
           ))}
         </Menu.Items>
@@ -189,14 +205,85 @@ function ModelValiablesSetting({
   setVariables,
 }: {
   variables: ChatModelVariable[];
-  setVariables: (variables: ChatModelVariable[]) => void;
+  setVariables: Dispatch<SetStateAction<ChatModelVariable[]>>;
 }) {
   return (
     <Popover className="relative">
-      <Popover.Button>Params</Popover.Button>
-
-      <Popover.Panel className="absolute z-10">
-        <div className="border rounded-md shadow-sm p-2 bg-white w-48">Param settings here</div>
+      <Popover.Button className="flex items-center border rounded-md p-1 text-gray-600 hover:text-gray-700 hover:bg-neutral-100">
+        <Cog8ToothIcon className="h-6 w-6" />
+      </Popover.Button>
+      <Popover.Panel className="absolute right-0 mt-1 z-10">
+        <div className="border rounded-md shadow-sm p-4 bg-white w-60 flex flex-col gap-4">
+          {variables.map((variable, index) => (
+            <div key={index} className="flex flex-col gap-y-1">
+              <div className="flex justify-between">
+                <label htmlFor={variable.name} className="text-sm font-semibold">
+                  {variable.name}
+                </label>
+                {variable.type === 'boolean' ? (
+                  <label htmlFor={variable.name} className="text-sm font-normal">
+                    {variable.value.toString()}
+                  </label>
+                ) : (
+                  <label htmlFor={variable.name} className="text-sm font-normal">
+                    {variable.value}
+                  </label>
+                )}
+              </div>
+              {variable.type === 'range' ? (
+                <input
+                  type="range"
+                  min={variable.min}
+                  max={variable.max}
+                  step={variable.step}
+                  value={variable.value}
+                  onChange={(e) => {
+                    setVariables((prev) => {
+                      return prev.map((v: ChatModelVariable) => {
+                        if (v.name === variable.name) {
+                          return { ...v, value: e.target.value };
+                        }
+                        return v;
+                      });
+                    });
+                  }}
+                />
+              ) : variable.type === 'string' ? (
+                <input
+                  type="text"
+                  value={variable.value}
+                  onChange={(e) => {
+                    setVariables((prev) => {
+                      return prev.map((v) => {
+                        if (v.name === variable.name) {
+                          return { ...v, value: e.target.value };
+                        }
+                        return v;
+                      });
+                    });
+                  }}
+                />
+              ) : variable.type === 'boolean' ? (
+                <input
+                  type="checkbox"
+                  checked={Boolean(variable.value)}
+                  onChange={(e) => {
+                    setVariables((prev) => {
+                      return prev.map((v) => {
+                        if (v.name === variable.name) {
+                          return { ...v, value: e.target.checked };
+                        }
+                        return v;
+                      });
+                    });
+                  }}
+                />
+              ) : (
+                <div>Unsupported type</div>
+              )}
+            </div>
+          ))}
+        </div>
       </Popover.Panel>
     </Popover>
   );
@@ -213,11 +300,6 @@ function Chat({
   chatParams: ChatModelParam[];
   initialMessages: ChatMessages;
 }) {
-  console.log('Chat component rendered.');
-  useEffect(() => {
-    console.log('Chat component moutned.');
-  }, []);
-
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
 
   // `messages` is stored state in useChat function with the `initialMessages` value.
@@ -226,7 +308,7 @@ function Chat({
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: `/api/chat/${chatModel.provider}`,
     initialMessages: initialMessages || [],
-    body: { id: id, provider: chatModel.provider, name: chatModel.name },
+    body: { id: id, provider: chatModel.provider, name: chatModel.name, params: chatParams },
     onFinish: (data) => {
       setLastRecievedMessage(data);
     },
@@ -252,7 +334,6 @@ function Chat({
             }),
           });
           const data = await response.json();
-          console.log('Create Fired', data);
           window?.history?.pushState(null, '', `/chat/${data.id}`);
         } else {
           const response = await fetch(`/api/conversation/${id}`, {
@@ -268,7 +349,6 @@ function Chat({
             }),
           });
           const data = await response.json();
-          console.log('Update Fired', data);
         }
       })();
     }

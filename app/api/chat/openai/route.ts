@@ -12,18 +12,18 @@ export async function POST(req: Request) {
   }
 
   // Extract the `messages` from the body of the request
-  const { messages, provider, name } = await req.json();
-  console.log('model=>', provider, name);
+  const { messages, provider, name, params } = await req.json();
+  console.log('model=>', provider, name, params);
   // Request the OpenAI API for the response based on the prompt
   const response = await openai.chat.completions.create({
     model: name,
     stream: true,
     messages: messages,
-    max_tokens: 500,
-    temperature: 0.7,
-    top_p: 1,
-    frequency_penalty: 1,
-    presence_penalty: 1,
+    max_tokens: params?.max_tokens?.value || 500,
+    temperature: params?.temperature?.value || 1.0,
+    top_p: params?.top_p?.value || 1.0,
+    frequency_penalty: params?.frequency_penalty?.value || 0.0,
+    presence_penalty: params?.presence_penalty?.value || 0.0,
   });
 
   // Convert the response into a friendly text-stream
