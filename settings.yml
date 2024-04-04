@@ -47,8 +47,6 @@ chat:
               min: -2.0
               max: 2.0
               step: 0.1
-            stream:
-              defaut: true
         gpt-4-0125-preview:
           display_name: "GPT-4-Turbo"
           description: "あらゆるタスクに最適"
@@ -85,8 +83,6 @@ chat:
               min: -2.0
               max: 2.0
               step: 0.1
-            stream:
-              defaut: true
     azure_openai:
       models:
         gpt-3.5-turbo:
@@ -129,8 +125,6 @@ chat:
               min: -2.0
               max: 2.0
               step: 0.1
-            stream:
-              defaut: true
         gpt-4:
           display_name: "GPT-4"
           description: "難しいタスクに最適"
@@ -171,5 +165,3 @@ chat:
               min: -2.0
               max: 2.0
               step: 0.1
-            stream:
-              defaut: true
