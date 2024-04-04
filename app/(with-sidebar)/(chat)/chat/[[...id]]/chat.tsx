@@ -15,7 +15,7 @@ import { useChat } from 'ai/react';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 import { CheckCircleIcon, ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
 import scrollbarStyles from '../../../scrollbar.module.css';
@@ -63,7 +63,7 @@ export function SavedChat({ id, modelOptions }: { id: string; modelOptions: Chat
     dedupingInterval: 0,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <></>;
   if (error) return <div>Error: {error.message}</div>;
   if (!data) return <div>Not Found</div>;
 
@@ -300,6 +300,7 @@ function Chat({
   chatParams: ChatModelParam[];
   initialMessages: ChatMessages;
 }) {
+  const { mutate } = useSWRConfig();
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
 
   // `messages` is stored state in useChat function with the `initialMessages` value.
@@ -321,12 +322,17 @@ function Chat({
     if (lastMessage.content === lastRecievedMessage.content) {
       (async () => {
         if (!id) {
+          const title =
+            messages.find((message) => message.role === 'user')?.content ||
+            messages.find((message) => message.role === 'assistant')?.content ||
+            'Untitled';
           const response = await fetch(`/api/conversation`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+              title: title.slice(0, 50),
               provider: chatModel.provider,
               name: chatModel.name,
               params: chatParams,
@@ -334,6 +340,7 @@ function Chat({
             }),
           });
           const data = await response.json();
+          mutate(`/api/conversation`);
           window?.history?.pushState(null, '', `/chat/${data.id}`);
         } else {
           const response = await fetch(`/api/conversation/${id}`, {

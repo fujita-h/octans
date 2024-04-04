@@ -1,21 +1,22 @@
 'use client';
 
 import SettingDialog from '@/components/dialogs/settings';
+import type { ChatData } from '@/types/chat';
 import type { User } from '@auth/core/types';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
+import Link from 'next/link';
 import { Fragment, useState } from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { MdOutlineApps } from 'react-icons/md';
-
+import useSWRInfinite from 'swr/infinite';
 import styles from './styles.module.css';
 
 export default function SidebarLayout({ user, children }: { user: User; children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <div>
       {/* Sidebar for small desktop and mobile, overlay when opened */}
@@ -91,23 +92,44 @@ export default function SidebarLayout({ user, children }: { user: User; children
 }
 
 function SidebarContent({ user }: { user: User }) {
+  const getKey = (pageIndex: number, previousPageData: ChatData[][]) => {
+    if (previousPageData && !previousPageData.length) return null; // reached the end
+    return `/api/conversation?page=${pageIndex + 1}`; // SWR key
+  };
+
+  const { data, size, setSize } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()));
+
+  console.log(data);
+
   return (
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
       <div className={clsx('flex flex-col flex-1 overflow-y-auto', styles['scrollbar-thin'])}>
-        {/* Sample Chat History... */}
-        {Array.from({ length: 50 }, (_, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-200/85 dark:hover:bg-gray-200/15"
+        {data?.flat().map((conversation: any) => {
+          const type = conversation.chat?.id ? 'chat' : undefined;
+          if (!type) return null;
+          return (
+            <div
+              key={conversation.id}
+              className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-200/85 dark:hover:bg-gray-200/15 group"
+            >
+              <div className="flex-grow truncate">
+                <Link href={`/${type}/${conversation.id}`}>
+                  <div className="text-xs text-gray-500 dark:text-neutral-400 truncate">{conversation.title}</div>
+                </Link>
+              </div>
+              <div className="flex-none text-xs hidden group-hover:block"> ic </div>
+            </div>
+          );
+        })}
+        <div>
+          <button
+            type="button"
+            onClick={() => setSize(size + 1)}
+            className="w-full p-2 rounded-md hover:bg-gray-200/85 dark:hover:bg-gray-200/15"
           >
-            <div className="flex-none">
-              <Avatar name={`${i}`} size="16px" variant="beam" square={false} />
-            </div>
-            <div className="flex-grow truncate">
-              <div className="text-xs text-gray-500 dark:text-neutral-400 truncate">Hello, World!</div>
-            </div>
-          </div>
-        ))}
+            Load more
+          </button>
+        </div>
       </div>
       <div className="flex-none">
         <ProfileButtonMenu user={user} />
