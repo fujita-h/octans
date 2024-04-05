@@ -117,6 +117,15 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model]);
 
+  // keep the messages in the state
+  const [messages, setMessages] = useState<ChatMessages>(chatData.messages);
+  useEffect(() => {
+    setMessages(chatData.messages);
+  }, [chatData]);
+
+  // check if the conversation is started
+  const isConversationStarted = messages.find((message) => message.role === 'user') ? true : false;
+
   if (!model) return <>_model_undefined_show_readonly_mode_</>;
 
   return (
@@ -124,7 +133,7 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
       <div className="flex-none flex items-center justify-between lg:justify-between px-4 py-1 h-12 max-h-12 border-b border-gray-100">
         <div className="block lg:hidden">{/* dummy block */}</div>
         <div className="flex items-center">
-          <ModelSelectMenu options={modelOptions} model={model} />
+          <ModelSelectMenu options={modelOptions} model={model} isConversationStarted={isConversationStarted} />
         </div>
         <div className="flex items-center">
           <ModelValiablesSetting variables={variables} setVariables={setVariables} />
@@ -142,12 +151,24 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
           };
         })}
         initialMessages={chatData.messages}
+        onMessageUpdate={(messages) => {
+          setMessages(messages);
+        }}
       />
     </div>
   );
 }
 
-function ModelSelectMenu({ options, model }: { options: ChatModelInfo[]; model: ChatModelInfo }) {
+function ModelSelectMenu({
+  options,
+  model,
+  isConversationStarted,
+}: {
+  options: ChatModelInfo[];
+  model: ChatModelInfo;
+  isConversationStarted: boolean;
+}) {
+  console.log('isConversationStarted', isConversationStarted);
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
@@ -166,34 +187,34 @@ function ModelSelectMenu({ options, model }: { options: ChatModelInfo[]; model: 
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-          {options.map((option, index) => (
-            <div key={index} className="py-1">
-              {model.provider === option.provider && model.name === option.name ? (
-                <div>
-                  <span className="bg-blue-100 text-gray-900 block px-4 py-2">
-                    <div className="flex gap-2 items-center text-sm font-semibold">
-                      <span>{option.display_name}</span>
-                      <CheckCircleIcon className="h-5 w-5 inline-block text-blue-600" />
-                    </div>
-                    <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
-                  </span>
-                </div>
-              ) : (
+        <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          {options.map((option, index) => {
+            const isActive = model.provider === option.provider && model.name === option.name;
+            return (
+              <div key={index} className="py-1">
                 <Menu.Item>
                   {({ active }) => (
                     <Link
                       href={`/chat?provider=${option.provider}&name=${option.name}`}
-                      className={clsx(active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2')}
+                      className={clsx(
+                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                        'relative block px-4 py-2'
+                      )}
                     >
-                      <div className="text-sm font-semibold">{option.display_name}</div>
+                      {isConversationStarted && active && (
+                        <span className="absolute top-1 right-2 text-sm text-gray-800 ">New Chat</span>
+                      )}
+                      <div className="text-sm font-semibold flex">
+                        <span>{option.display_name}</span>
+                        {isActive && <CheckCircleIcon className="ml-2 h-5 w-5 text-green-500" />}
+                      </div>
                       <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
                     </Link>
                   )}
                 </Menu.Item>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </Menu.Items>
       </Transition>
     </Menu>
@@ -294,11 +315,13 @@ function Chat({
   chatModel,
   chatParams,
   initialMessages,
+  onMessageUpdate,
 }: {
   id?: string;
   chatModel: ChatModelIdentifier;
   chatParams: ChatModelParam[];
   initialMessages: ChatMessages;
+  onMessageUpdate?: (messages: ChatMessages) => void;
 }) {
   const { mutate } = useSWRConfig();
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
@@ -358,6 +381,7 @@ function Chat({
           const data = await response.json();
         }
       })();
+      onMessageUpdate?.(messages);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
