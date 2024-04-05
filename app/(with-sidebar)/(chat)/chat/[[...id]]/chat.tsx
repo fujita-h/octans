@@ -16,7 +16,7 @@ import clsx from 'clsx/lite';
 import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-
+import { unstable_serialize } from 'swr/infinite';
 import { CheckCircleIcon, ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
 import scrollbarStyles from '../../../scrollbar.module.css';
 
@@ -363,7 +363,7 @@ function Chat({
             }),
           });
           const data = await response.json();
-          mutate(`/api/conversation`);
+          mutate(unstable_serialize((index) => `/api/conversation?page=${index + 1}`));
           window?.history?.pushState(null, '', `/chat/${data.id}`);
         } else {
           const response = await fetch(`/api/conversation/${id}`, {
