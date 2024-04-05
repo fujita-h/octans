@@ -168,7 +168,6 @@ function ModelSelectMenu({
   model: ChatModelInfo;
   isConversationStarted: boolean;
 }) {
-  console.log('isConversationStarted', isConversationStarted);
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
