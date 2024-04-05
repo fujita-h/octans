@@ -12,6 +12,7 @@ import { Fragment, useState } from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { MdOutlineApps } from 'react-icons/md';
+import { useInView } from 'react-intersection-observer';
 import useSWRInfinite from 'swr/infinite';
 import styles from './styles.module.css';
 
@@ -92,14 +93,18 @@ export default function SidebarLayout({ user, children }: { user: User; children
 }
 
 function SidebarContent({ user }: { user: User }) {
+  const { ref, inView } = useInView();
   const getKey = (pageIndex: number, previousPageData: ChatData[][]) => {
     if (previousPageData && !previousPageData.length) return null; // reached the end
     return `/api/conversation?page=${pageIndex + 1}`; // SWR key
   };
 
-  const { data, size, setSize } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()));
+  const { data, size, setSize, isValidating } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()));
+  const isReachingEnd = data && data[data.length - 1]?.length === 0;
 
-  console.log(data);
+  if (inView && !isReachingEnd && !isValidating) {
+    setSize(size + 1);
+  }
 
   return (
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
@@ -121,15 +126,7 @@ function SidebarContent({ user }: { user: User }) {
             </div>
           );
         })}
-        <div>
-          <button
-            type="button"
-            onClick={() => setSize(size + 1)}
-            className="w-full p-2 rounded-md hover:bg-gray-200/85 dark:hover:bg-gray-200/15"
-          >
-            Load more
-          </button>
-        </div>
+        <div ref={ref} aria-hidden="true" />
       </div>
       <div className="flex-none">
         <ProfileButtonMenu user={user} />
