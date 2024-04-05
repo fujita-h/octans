@@ -8,7 +8,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { MdOutlineApps } from 'react-icons/md';
@@ -100,11 +100,14 @@ function SidebarContent({ user }: { user: User }) {
   };
 
   const { data, size, setSize, isValidating } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()));
-  const isReachingEnd = data && data[data.length - 1]?.length === 0;
 
-  if (inView && !isReachingEnd && !isValidating) {
-    setSize(size + 1);
-  }
+  useEffect(() => {
+    const isReachingEnd = data && data[data.length - 1]?.length === 0;
+    if (inView && !isReachingEnd && !isValidating) {
+      setSize(size + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, data, isValidating]);
 
   return (
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
