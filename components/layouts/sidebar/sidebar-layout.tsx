@@ -113,7 +113,7 @@ function SidebarContent({ user }: { user: User }) {
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
       <div className={clsx('flex flex-col flex-1 overflow-y-auto', styles['scrollbar-thin'])}>
         {data?.flat().map((conversation: any) => {
-          const type = conversation.chat?.id ? 'chat' : undefined;
+          const type = conversation.chat?.id ? 'c' : undefined;
           if (!type) return null;
           return (
             <div

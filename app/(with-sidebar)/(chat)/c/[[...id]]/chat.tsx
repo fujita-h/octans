@@ -194,7 +194,7 @@ function ModelSelectMenu({
                 <Menu.Item>
                   {({ active }) => (
                     <Link
-                      href={`/chat?provider=${option.provider}&name=${option.name}`}
+                      href={`/c?provider=${option.provider}&name=${option.name}`}
                       className={clsx(
                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                         'relative block px-4 py-2'
