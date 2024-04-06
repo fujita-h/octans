@@ -346,6 +346,7 @@ function Chat({
   initialMessages: ChatMessages;
   onMessageUpdate?: (messages: ChatMessages) => void;
 }) {
+  const [idState, setIdState] = useState(id);
   const { mutate } = useSWRConfig();
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
 
@@ -367,7 +368,7 @@ function Chat({
     if (lastMessage.role !== lastRecievedMessage.role) return;
     if (lastMessage.content === lastRecievedMessage.content) {
       (async () => {
-        if (!id) {
+        if (!idState) {
           const title =
             messages.find((message) => message.role === 'user')?.content ||
             messages.find((message) => message.role === 'assistant')?.content ||
@@ -387,6 +388,7 @@ function Chat({
           });
           const data = await response.json();
           mutate(unstable_serialize((index) => `/api/conversation?page=${index + 1}`));
+          setIdState(data.id);
           window?.history?.pushState(null, '', `/c/${data.id}`);
         } else {
           const response = await fetch(`/api/conversation/${id}`, {
