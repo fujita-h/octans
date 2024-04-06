@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
+import ReactMarkdown from 'react-markdown';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import scrollbarStyles from '../../../scrollbar.module.css';
@@ -441,7 +442,9 @@ function Chat({
                     </div>
                     <div>
                       <div className="font-semibold select-none">{message.role === 'user' ? 'You' : 'Assistant'}</div>
-                      <div>{message.content}</div>
+                      <div>
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 </div>
