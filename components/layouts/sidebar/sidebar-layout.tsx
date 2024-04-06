@@ -4,7 +4,7 @@ import SettingDialog from '@/components/dialogs/settings';
 import type { ChatData } from '@/types/chat';
 import type { User } from '@auth/core/types';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, PencilSquareIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
@@ -111,7 +111,15 @@ function SidebarContent({ user }: { user: User }) {
 
   return (
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
-      <div className={clsx('flex flex-col flex-1 overflow-y-auto', styles['scrollbar-thin'])}>
+      <div className="flex-none pr-2">
+        <Link href="/c">
+          <div className="w-full flex items-center justify-between rounded-md p-2 text-gray-500 dark:text-neutral-400 hover:bg-gray-200/85 dark:hover:bg-gray-200/15">
+            <div className="text-base font-semibold">New Chat</div>
+            <PencilSquareIcon className="w-5 h-5" />
+          </div>
+        </Link>
+      </div>
+      <div className={clsx('flex flex-col flex-1 overflow-y-auto pr-1', styles['scrollbar-thin'])}>
         {data?.flat().map((conversation: any) => {
           const type = conversation.chat?.id ? 'c' : undefined;
           if (!type) return null;
