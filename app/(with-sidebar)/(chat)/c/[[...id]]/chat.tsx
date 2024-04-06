@@ -387,7 +387,7 @@ function Chat({
           });
           const data = await response.json();
           mutate(unstable_serialize((index) => `/api/conversation?page=${index + 1}`));
-          window?.history?.pushState(null, '', `/chat/${data.id}`);
+          window?.history?.pushState(null, '', `/c/${data.id}`);
         } else {
           const response = await fetch(`/api/conversation/${id}`, {
             method: 'POST',
