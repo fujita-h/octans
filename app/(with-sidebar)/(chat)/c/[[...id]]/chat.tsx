@@ -11,13 +11,15 @@ import type {
   ChatModelVariable,
 } from '@/types/chat';
 import { Menu, Popover, Transition } from '@headlessui/react';
+import { ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { useChat } from 'ai/react';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
+import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
-import { CheckCircleIcon, ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
 import scrollbarStyles from '../../../scrollbar.module.css';
 
 export function NewChat({
@@ -188,7 +190,7 @@ function ModelSelectMenu({
       >
         <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           {options.map((option, index) => {
-            const isActive = model.provider === option.provider && model.name === option.name;
+            const isSelected = model.provider === option.provider && model.name === option.name;
             return (
               <div key={index} className="py-1">
                 <Menu.Item>
@@ -197,17 +199,31 @@ function ModelSelectMenu({
                       href={`/c?provider=${option.provider}&name=${option.name}`}
                       className={clsx(
                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                        'relative block px-4 py-2'
+                        'relative block px-4 py-3'
                       )}
                     >
                       {isConversationStarted && active && (
-                        <span className="absolute top-1 right-2 text-sm text-gray-800 ">New Chat</span>
+                        <div className="absolute top-1 right-2 text-gray-800">
+                          <span className="text-sm text-gray-800 ">New Chat</span>
+                          <PencilSquareIcon className="ml-2 h-4 w-4 inline-block" />
+                        </div>
                       )}
-                      <div className="text-sm font-semibold flex">
-                        <span>{option.display_name}</span>
-                        {isActive && <CheckCircleIcon className="ml-2 h-5 w-5 text-green-500" />}
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-sm font-semibold flex">
+                            <span>{option.display_name}</span>
+                          </div>
+                          <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
+                        </div>
+                        <div className="flex-none">
+                          {isSelected && !(isConversationStarted && active) && (
+                            <MdCheckCircle className="h-5 w-5 text-gray-600" />
+                          )}
+                          {!isSelected && !(isConversationStarted && active) && (
+                            <MdOutlineRadioButtonUnchecked className="h-5 w-5 text-gray-600" />
+                          )}
+                        </div>
                       </div>
-                      <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
                     </Link>
                   )}
                 </Menu.Item>
