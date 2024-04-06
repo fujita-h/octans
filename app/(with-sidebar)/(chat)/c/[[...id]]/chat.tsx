@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
+import { useInView } from 'react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
@@ -349,6 +350,11 @@ function Chat({
 }) {
   const [idState, setIdState] = useState(id);
   const { mutate } = useSWRConfig();
+
+  // useInView for checking the end of messages
+  // This is used to scroll to the end of messages when new messages are added.
+  const { ref: endOfMessagesRef, inView: isEndOfMessagesInView, entry: endOfMessagesEntry } = useInView();
+
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
 
   // `messages` is stored state in useChat function with the `initialMessages` value.
@@ -363,8 +369,18 @@ function Chat({
     },
   });
 
+  // This effect will be triggered when messages are updated.
   useEffect(() => {
     if (messages.length === 0) return;
+
+    // scroll to the end of messages when new messages are added.
+    if (isEndOfMessagesInView) {
+      endOfMessagesEntry?.target.scrollIntoView({ behavior: 'instant', block: 'end' });
+    }
+
+    // check the last message and the last received message,
+    // if the last message is the same as the last received message,
+    // this means the conversation is ended.
     const lastMessage = messages[messages.length - 1];
     if (lastMessage.role !== lastRecievedMessage.role) return;
     if (lastMessage.content === lastRecievedMessage.content) {
@@ -415,14 +431,13 @@ function Chat({
 
   return (
     <>
-      <div className={clsx('flex-1 flex flex-col text-sm ml-4 py-1 overflow-auto', scrollbarStyles['scrollbar-thin'])}>
-        {
-          // View messages in UI state
-          messages
+      <div className={clsx('flex-1 ml-4 overflow-auto', scrollbarStyles['scrollbar-thin'])}>
+        <div className={clsx('flex flex-col text-sm mt-4 gap-4')}>
+          {messages
             .filter((message) => message.role !== 'system')
             .map((message, index) => (
               <div key={index} className="w-full">
-                <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
+                <div className="px-4 justify-center text-base md:gap-6 m-auto">
                   <div className="flex flex-1 text-base mx-auto gap-3 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
                     <div>
                       {message.role === 'user' &&
@@ -449,8 +464,9 @@ function Chat({
                   </div>
                 </div>
               </div>
-            ))
-        }
+            ))}
+        </div>
+        <div ref={endOfMessagesRef} className="h-4" aria-hidden="true" />
       </div>
       <div className="flex-none p-4">
         <form onSubmit={handleSubmit}>
