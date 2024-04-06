@@ -1,7 +1,7 @@
 import { LoginForm } from '@/components/auth';
 import { auth } from '@/lib/auth';
 import { settingsChatDefaultModelInfo, settingsChatDefaultSystemPrompt, settingsChatModels } from '@/lib/settings';
-import { type ChatModelDefinition, type ChatModel } from '@/types/chat';
+import { type ChatModel, type ChatModelDefinition } from '@/types/chat';
 import { NewChat, SavedChat } from './chat';
 
 export default async function Page({
@@ -45,8 +45,10 @@ export default async function Page({
 
   // Render the NewChat or SavedChat component based on the id
   if (!id) {
-    return <NewChat modelOptions={models} provider={searchParams.provider} name={searchParams.name} />;
+    return (
+      <NewChat user={session.user} modelOptions={models} provider={searchParams.provider} name={searchParams.name} />
+    );
   } else {
-    return <SavedChat id={id} modelOptions={models} />;
+    return <SavedChat user={session.user} id={id} modelOptions={models} />;
   }
 }

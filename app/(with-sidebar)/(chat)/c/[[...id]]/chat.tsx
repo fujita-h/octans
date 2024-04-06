@@ -10,23 +10,28 @@ import type {
   ChatModelParam,
   ChatModelVariable,
 } from '@/types/chat';
+import type { User } from '@auth/core/types';
 import { Menu, Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon, Cog8ToothIcon } from '@heroicons/react/20/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { useChat } from 'ai/react';
+import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
+import { SiOpenai } from 'react-icons/si';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import scrollbarStyles from '../../../scrollbar.module.css';
 
 export function NewChat({
+  user,
   modelOptions,
   provider,
   name,
 }: {
+  user: User;
   modelOptions: ChatModel[];
   provider?: string;
   name?: string;
@@ -55,10 +60,10 @@ export function NewChat({
       : [],
   };
 
-  return <ChatFrame modelOptions={modelOptions} chatData={newChatData} />;
+  return <ChatFrame user={user} modelOptions={modelOptions} chatData={newChatData} />;
 }
 
-export function SavedChat({ id, modelOptions }: { id: string; modelOptions: ChatModel[] }) {
+export function SavedChat({ user, id, modelOptions }: { user: User; id: string; modelOptions: ChatModel[] }) {
   const { data, isLoading, error } = useSWR(`/api/conversation/${id}`, {
     revalidateOnMount: true,
     revalidateOnFocus: false,
@@ -78,12 +83,12 @@ export function SavedChat({ id, modelOptions }: { id: string; modelOptions: Chat
     messages: data.messages,
   };
 
-  return <ChatFrame modelOptions={modelOptions} chatData={savedChatData} />;
+  return <ChatFrame user={user} modelOptions={modelOptions} chatData={savedChatData} />;
 }
 
 // Separate ModelSelectMenu and Chat components.
 // This is to avoid re-rendering the ModelSelectMenu component when the Chat component re-renders.
-function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chatData: ChatData }) {
+function ChatFrame({ user, modelOptions, chatData }: { user: User; modelOptions: ChatModel[]; chatData: ChatData }) {
   // Generate a key for the Chat component to control the re-mount the component.
   // If the key is changed, the Chat component will re-mount.
   // Note: Chat component have own state, so it will not be affected by the re-rendering.
@@ -142,6 +147,7 @@ function ChatFrame({ modelOptions, chatData }: { modelOptions: ChatModel[]; chat
         </div>
       </div>
       <Chat
+        user={user}
         key={chatKey} // used for re-mount of the Chat component
         id={chatData.id}
         chatModel={model}
@@ -326,12 +332,14 @@ function ModelValiablesSetting({
 }
 
 function Chat({
+  user,
   id,
   chatModel,
   chatParams,
   initialMessages,
   onMessageUpdate,
 }: {
+  user: User;
   id?: string;
   chatModel: ChatModelIdentifier;
   chatParams: ChatModelParam[];
@@ -404,13 +412,38 @@ function Chat({
 
   return (
     <>
-      <div className={clsx('flex-1 ml-4 py-1 overflow-auto', scrollbarStyles['scrollbar-thin'])}>
+      <div className={clsx('flex-1 flex flex-col text-sm ml-4 py-1 overflow-auto', scrollbarStyles['scrollbar-thin'])}>
         {
           // View messages in UI state
           messages
             .filter((message) => message.role !== 'system')
             .map((message, index) => (
-              <div key={index}>{message.content}</div>
+              <div key={index} className="w-full">
+                <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
+                  <div className="flex flex-1 text-base mx-auto gap-3 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
+                    <div>
+                      {message.role === 'user' &&
+                        (user.image ? (
+                          <img
+                            className="w-6 h-6 rounded-full"
+                            src={user.image}
+                            alt=""
+                            width="24px"
+                            height="24px"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <Avatar name={user.email || user.uid} size="24px" variant="beam" square={false} />
+                        ))}
+                      {message.role === 'assistant' && <SiOpenai className="w-6 h-6 text-gray-500" />}
+                    </div>
+                    <div>
+                      <div className="font-semibold select-none">{message.role === 'user' ? 'You' : 'Assistant'}</div>
+                      <div>{message.content}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))
         }
       </div>
