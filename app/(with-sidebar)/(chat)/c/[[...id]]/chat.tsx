@@ -18,7 +18,7 @@ import { useChat } from 'ai/react';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
-import React, { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useEffect, useRef, useState } from 'react';
 import { BsArrowUpSquareFill } from 'react-icons/bs';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
@@ -358,7 +358,18 @@ function Chat({
 
   // useInView for checking the end of messages
   // This is used to scroll to the end of messages when new messages are added.
-  const { ref: endOfMessagesRef, inView: isEndOfMessagesInView, entry: endOfMessagesEntry } = useInView();
+  const {
+    ref: endOfMessagesMarkerRef,
+    inView: isEndOfMessagesMarkerInView,
+    entry: endOfMessagesMarkerEntry,
+  } = useInView();
+
+  // another ref for the end of messages.
+  // This is used to scroll to the end of messages when 1st rendering.
+  const endOfMessagesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    endOfMessagesRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' });
+  }, [endOfMessagesRef]);
 
   const [lastRecievedMessage, setLastRecievedMessage] = useState({ role: '', content: '' });
 
@@ -379,8 +390,8 @@ function Chat({
     if (messages.length === 0) return;
 
     // scroll to the end of messages when new messages are added.
-    if (isEndOfMessagesInView) {
-      endOfMessagesEntry?.target.scrollIntoView({ behavior: 'instant', block: 'end' });
+    if (isEndOfMessagesMarkerInView) {
+      endOfMessagesMarkerEntry?.target.scrollIntoView({ behavior: 'instant', block: 'end' });
     }
 
     // check the last message and the last received message,
@@ -522,7 +533,8 @@ function Chat({
               </div>
             ))}
         </div>
-        <div ref={endOfMessagesRef} className="h-4" aria-hidden="true" />
+        <div ref={endOfMessagesMarkerRef} className="h-4" aria-hidden="true" />
+        <div ref={endOfMessagesRef} />
       </div>
       <div className="flex-none p-4">
         <form className="relative mx-auto md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]" onSubmit={handleSubmit}>
