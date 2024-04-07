@@ -410,7 +410,7 @@ function Chat({
           setIdState(data.id);
           window?.history?.pushState(null, '', `/c/${data.id}`);
         } else {
-          const response = await fetch(`/api/conversation/${id}`, {
+          const response = await fetch(`/api/conversation/${idState}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
