@@ -99,7 +99,9 @@ function SidebarContent({ user }: { user: User }) {
     return `/api/conversation?page=${pageIndex + 1}`; // SWR key
   };
 
-  const { data, size, setSize, isValidating } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()));
+  const { data, size, setSize, isValidating } = useSWRInfinite(getKey, (url) => fetch(url).then((res) => res.json()), {
+    revalidateAll: true,
+  });
 
   useEffect(() => {
     const isReachingEnd = data && data[data.length - 1]?.length === 0;
