@@ -383,6 +383,9 @@ function Chat({
     onFinish: (data) => {
       setLastRecievedMessage(data);
     },
+    onError: (error) => {
+      console.error(error);
+    },
   });
 
   // This effect will be triggered when messages are updated.
