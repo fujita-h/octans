@@ -14,14 +14,14 @@ chat:
           display_name: "GPT-3.5"
           description: "あらゆるタスクに最適"
           # system_prompt: "Use Japanese default. Use Markdown for text decoration and code examples."
-          token_limit: 4096
+          token_limit: 16385
           allowed_roles: []
           variables:
-            max_token:
+            max_tokens:
               type: range
-              default: 500
-              min: 0
-              max: 4000
+              default: 1600
+              min: 200
+              max: 16000
               step: 200
             temperature:
               type: range
@@ -53,11 +53,11 @@ chat:
           token_limit: 128000
           allowed_roles: []
           variables:
-            max_token:
+            max_tokens:
               type: range
-              default: 500
-              min: 0
-              max: 4000
+              default: 4000
+              min: 200
+              max: 12800
               step: 200
             temperature:
               type: range
@@ -95,10 +95,10 @@ chat:
             type: env
             key: AZURE_OPENAI_API_KEY
           variables:
-            max_token:
+            max_tokens:
               type: range
-              default: 500
-              min: 0
+              default: 1000
+              min: 200
               max: 4000
               step: 200
             temperature:
@@ -135,10 +135,10 @@ chat:
             type: env
             key: AZURE_OPENAI_API_KEY
           variables:
-            max_token:
+            max_tokens:
               type: range
-              default: 500
-              min: 0
+              default: 1000
+              min: 200
               max: 8000
               step: 200
             temperature:
