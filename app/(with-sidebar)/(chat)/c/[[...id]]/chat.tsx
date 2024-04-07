@@ -19,7 +19,7 @@ import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
 import React, { Dispatch, Fragment, SetStateAction, useEffect, useRef, useState } from 'react';
-import { BsArrowUpSquareFill } from 'react-icons/bs';
+import { BsArrowUpSquareFill, BsStopCircle } from 'react-icons/bs';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
 import { useInView } from 'react-intersection-observer';
@@ -376,7 +376,7 @@ function Chat({
   // `messages` is stored state in useChat function with the `initialMessages` value.
   // `input` is also stored state in useChat function with the `initialMessages` value.
   // Thus, the `messages` and `input` will not affected by the re-rendering of the component.
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const { messages, input, isLoading, handleInputChange, handleSubmit, stop, reload } = useChat({
     api: `/api/chat/${chatModel.provider}`,
     initialMessages: initialMessages || [],
     body: { id: id, provider: chatModel.provider, name: chatModel.name, params: chatParams },
@@ -551,13 +551,27 @@ function Chat({
             onKeyDown={(e) => {
               if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
+                if (isLoading) return;
                 e.currentTarget.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true }));
               }
             }}
           />
-          <button type="submit" className="absolute bottom-4 right-3">
-            <BsArrowUpSquareFill className={clsx('w-7 h-7', input ? 'text-gray-500' : 'text-gray-300')} />
-          </button>
+          {isLoading ? (
+            <button type="button" className="absolute bottom-4 right-3" onClick={stop}>
+              <BsStopCircle className="w-7 h-7 text-gray-500" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="absolute bottom-4 right-3"
+              onClick={(e) => {
+                if (isLoading) return;
+                e.currentTarget.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true }));
+              }}
+            >
+              <BsArrowUpSquareFill className={clsx('w-7 h-7', input ? 'text-gray-500' : 'text-gray-300')} />
+            </button>
+          )}
         </form>
       </div>
     </>
