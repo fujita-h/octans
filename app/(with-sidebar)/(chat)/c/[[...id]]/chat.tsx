@@ -19,10 +19,12 @@ import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
+import { BsArrowUpSquareFill } from 'react-icons/bs';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
 import { useInView } from 'react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
+import TextareaAutosize from 'react-textarea-autosize';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import scrollbarStyles from '../../../scrollbar.module.css';
@@ -457,7 +459,7 @@ function Chat({
                     </div>
                     <div>
                       <div className="font-semibold select-none">{message.role === 'user' ? 'You' : 'Assistant'}</div>
-                      <div>
+                      <div className={clsx(message.role === 'user' && 'whitespace-pre-wrap')}>
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     </div>
@@ -469,12 +471,27 @@ function Chat({
         <div ref={endOfMessagesRef} className="h-4" aria-hidden="true" />
       </div>
       <div className="flex-none p-4">
-        <form onSubmit={handleSubmit}>
-          <input
-            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-200 "
+        <form className="relative mx-auto md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]" onSubmit={handleSubmit}>
+          <TextareaAutosize
+            minRows={1}
+            maxRows={8}
             value={input}
             onChange={handleInputChange}
+            className={clsx(
+              'w-full resize-none pl-4 pr-12 py-3 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-200',
+              scrollbarStyles['scrollbar-thin'],
+              scrollbarStyles['scrollbar-thin-xs']
+            )}
+            onKeyDown={(e) => {
+              if (e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault();
+                e.currentTarget.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true }));
+              }
+            }}
           />
+          <button type="submit" className="absolute bottom-4 right-3">
+            <BsArrowUpSquareFill className={clsx('w-7 h-7', input ? 'text-gray-500' : 'text-gray-300')} />
+          </button>
         </form>
       </div>
     </>

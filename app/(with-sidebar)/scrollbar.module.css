@@ -3,6 +3,11 @@
   height: 1rem;
 }
 
+.scrollbar-thin-xs::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.8rem;
+}
+
 .scrollbar-thin::-webkit-scrollbar-thumb {
   @apply bg-neutral-200;
   border-radius: 9999px;
