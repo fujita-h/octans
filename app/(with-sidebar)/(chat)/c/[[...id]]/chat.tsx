@@ -18,15 +18,18 @@ import { useChat } from 'ai/react';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
-import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import { BsArrowUpSquareFill } from 'react-icons/bs';
 import { MdCheckCircle, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { SiOpenai } from 'react-icons/si';
 import { useInView } from 'react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
 import TextareaAutosize from 'react-textarea-autosize';
+import rehypeHighlight from 'rehype-highlight';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
+
+import 'highlight.js/styles/a11y-dark.min.css';
 import scrollbarStyles from '../../../scrollbar.module.css';
 
 export function NewChat({
@@ -459,9 +462,60 @@ function Chat({
                     </div>
                     <div>
                       <div className="font-semibold select-none">{message.role === 'user' ? 'You' : 'Assistant'}</div>
-                      <div className={clsx(message.role === 'user' && 'whitespace-pre-wrap')}>
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
-                      </div>
+                      {message.role === 'user' && <div className="whitespace-pre-wrap">{message.content}</div>}
+                      {message.role === 'assistant' && (
+                        <div>
+                          <ReactMarkdown
+                            rehypePlugins={[rehypeHighlight]}
+                            components={{
+                              pre: ({ node, children, ...props }) => {
+                                let codeId: string | undefined = undefined;
+                                let codeLanguage: string | undefined = undefined;
+                                React.Children.forEach(children, (child) => {
+                                  if (codeId) return;
+                                  if (React.isValidElement(child) && child.type === 'code') {
+                                    codeId = nanoid_case_insensitive(10);
+                                    const className = child.props.className;
+                                    const match = className?.match(/language-(\w+)/);
+                                    if (match) {
+                                      codeLanguage = match[1];
+                                    }
+                                  }
+                                });
+                                if (codeId) {
+                                  return (
+                                    <div className="my-4 hljs rounded-md p-0.5">
+                                      <div
+                                        className="flex justify-between bg-neutral-900 text-white text-xs px-3 py-2 rounded-t-md"
+                                        data-language={codeLanguage}
+                                      >
+                                        <div>{codeLanguage}</div>
+                                        <button
+                                          type="button"
+                                          onClick={async () => {
+                                            const content = document.getElementById(`pre-code-${codeId}`)?.textContent;
+                                            if (!content) return;
+                                            await global.navigator.clipboard.writeText(content);
+                                          }}
+                                        >
+                                          Copy code
+                                        </button>
+                                      </div>
+                                      <pre id={`pre-code-${codeId}`} {...props}>
+                                        {children}
+                                      </pre>
+                                    </div>
+                                  );
+                                } else {
+                                  return <pre {...props}>{children}</pre>;
+                                }
+                              },
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
