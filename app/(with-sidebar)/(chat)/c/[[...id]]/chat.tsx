@@ -186,9 +186,9 @@ function ModelSelectMenu({
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white dark:bg-neutral-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-neutral-100 shadow-sm ring-2 ring-inset ring-gray-300 hover:bg-gray-50">
           {model.display_name}
-          <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+          <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400 dark:text-neutral-200" aria-hidden="true" />
         </Menu.Button>
       </div>
 
@@ -201,7 +201,7 @@ function ModelSelectMenu({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute left-0 z-10 mt-2 w-64 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           {options.map((option, index) => {
             const isSelected = model.provider === option.provider && model.name === option.name;
             return (
@@ -211,13 +211,15 @@ function ModelSelectMenu({
                     <Link
                       href={`/c?provider=${option.provider}&name=${option.name}`}
                       className={clsx(
-                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                        active
+                          ? 'bg-gray-100 dark:bg-neutral-700 text-gray-900 dark:text-white'
+                          : 'text-gray-700 dark:text-neutral-100',
                         'relative block px-4 py-3'
                       )}
                     >
                       {isConversationStarted && active && (
-                        <div className="absolute top-1 right-2 text-gray-800">
-                          <span className="text-sm text-gray-800 ">New Chat</span>
+                        <div className="absolute top-1 right-2 text-gray-800 dark:text-white">
+                          <span className="text-sm">New Chat</span>
                           <PencilSquareIcon className="ml-2 h-4 w-4 inline-block" />
                         </div>
                       )}
@@ -226,14 +228,16 @@ function ModelSelectMenu({
                           <div className="text-sm font-semibold flex">
                             <span>{option.display_name}</span>
                           </div>
-                          <div className="mt-2 ml-2 text-xs text-gray-600">{option.description}</div>
+                          <div className="mt-2 ml-2 text-xs text-gray-600 dark:text-neutral-300">
+                            {option.description}
+                          </div>
                         </div>
                         <div className="flex-none">
                           {isSelected && !(isConversationStarted && active) && (
-                            <MdCheckCircle className="h-5 w-5 text-gray-600" />
+                            <MdCheckCircle className="h-5 w-5 text-gray-600 dark:text-neutral-200" />
                           )}
                           {!isSelected && !(isConversationStarted && active) && (
-                            <MdOutlineRadioButtonUnchecked className="h-5 w-5 text-gray-600" />
+                            <MdOutlineRadioButtonUnchecked className="h-5 w-5 text-gray-600 dark:text-neutral-200" />
                           )}
                         </div>
                       </div>
@@ -258,11 +262,11 @@ function ModelValiablesSetting({
 }) {
   return (
     <Popover className="relative">
-      <Popover.Button className="flex items-center border rounded-md p-1 text-gray-600 hover:text-gray-700 hover:bg-neutral-100">
+      <Popover.Button className="flex items-center border rounded-md p-1 ring-2 ring-gray-300 text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 hover:bg-neutral-100 dark:hover:bg-neutral-900">
         <Cog8ToothIcon className="h-6 w-6" />
       </Popover.Button>
       <Popover.Panel className="absolute right-0 mt-1 z-10">
-        <div className="border rounded-md shadow-sm p-4 bg-white w-60 flex flex-col gap-4">
+        <div className="border rounded-md shadow-sm p-4 bg-white dark:bg-neutral-800 w-60 flex flex-col gap-4">
           {variables.map((variable, index) => (
             <div key={index} className="flex flex-col gap-y-1">
               <div className="flex justify-between">
