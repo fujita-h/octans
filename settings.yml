@@ -85,15 +85,17 @@ chat:
               step: 0.1
     azure-openai:
       models:
-        gpt-3.5-turbo:
-          display_name: "GPT-3.5"
+        gpt-35-turbo:
+          display_name: "Azure GPT-3.5"
           description: "あらゆるタスクに最適"
           token_limit: 4096
           allowed_roles: ["Test.Test", "aa"]
-          endpoint: https://your_aoai_service.openai.azure.com/
+          endpoint:
+            type: env
+            value: AZURE_OPENAI_ENDPOINT
           api_key:
             type: env
-            key: AZURE_OPENAI_API_KEY
+            value: AZURE_OPENAI_KEY
           variables:
             max_tokens:
               type: range
@@ -126,14 +128,16 @@ chat:
               max: 2.0
               step: 0.1
         gpt-4:
-          display_name: "GPT-4"
+          display_name: "Azure GPT-4"
           description: "難しいタスクに最適"
           token_limit: 8192
           allowed_roles: []
-          endpoint: https://your_aoai_service.openai.azure.com/
+          endpoint: 
+            type: env
+            value: AZURE_OPENAI_ENDPOINT
           api_key:
             type: env
-            key: AZURE_OPENAI_API_KEY
+            value: AZURE_OPENAI_KEY
           variables:
             max_tokens:
               type: range
