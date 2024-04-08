@@ -1,0 +1,30 @@
+.scrollbar-thin::-webkit-scrollbar {
+  width: 0.6rem;
+  height: 1rem;
+}
+
+.scrollbar-thin-xs::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.8rem;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-neutral-200;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-300/80;
+}
+
+:global(.dark) .scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-neutral-600/80;
+}
+
+:global(.dark) .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-500/80;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
