@@ -178,7 +178,7 @@ function ProfileButtonMenu({ user }: { user: User }) {
       >
         <Menu.Items className="absolute bottom-14 z-[5] mt-2 px-1 w-[232px] origin-bottom-left divide-y divide-gray-100 dark:divide-neutral-700 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black dark:ring-neutral-700 ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            <Menu.Item>
+            {/* <Menu.Item>
               {({ active }) => (
                 <a
                   href="#"
@@ -196,7 +196,7 @@ function ProfileButtonMenu({ user }: { user: User }) {
                   マイ アプリ
                 </a>
               )}
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item>
               {({ active }) => (
                 <button
