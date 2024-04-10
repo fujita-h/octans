@@ -47,7 +47,7 @@ chat:
               min: -2.0
               max: 2.0
               step: 0.1
-        gpt-4-0125-preview:
+        gpt-4-turbo:
           display_name: "GPT-4-Turbo"
           description: "あらゆるタスクに最適"
           token_limit: 128000
