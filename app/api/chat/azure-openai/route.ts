@@ -24,18 +24,19 @@ export async function POST(req: Request) {
   }
 
   // Extract the `messages` from the body of the request
-  const { messages, provider, name, params } = await req.json();
+  const { messages, provider, name, params }: { messages?: any; provider?: any; name?: any; params?: any[] } =
+    await req.json();
 
   // select model
   const client = clients[name];
 
   // Request the Azure OpenAI API for the response based on the prompt
   const response = await client.streamChatCompletions(name, messages, {
-    maxTokens: params?.max_tokens?.value || 500,
-    temperature: params?.temperature?.value || 1.0,
-    topP: params?.top_p?.value || 1.0,
-    frequencyPenalty: params?.frequency_penalty?.value || 0.0,
-    presencePenalty: params?.presence_penalty?.value || 0.0,
+    maxTokens: params?.find((param) => param.name === 'max_tokens')?.value || 500,
+    temperature: params?.find((param) => param.name === 'temperature')?.value || 1.0,
+    topP: params?.find((param) => param.name === 'top_p')?.value || 1.0,
+    frequencyPenalty: params?.find((param) => param.name === 'frequency_penalty')?.value || 0.0,
+    presencePenalty: params?.find((param) => param.name === 'presence_penalty')?.value || 0.0,
   });
 
   // Convert the response into a friendly text-stream
