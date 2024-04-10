@@ -2,7 +2,7 @@ chat:
   default:
     model:
       provider: openai
-      model: gpt-4-0125-preview
+      model: gpt-4-turbo
     system_prompt: "Use Japanese default. Use Markdown for text decoration and code examples."
   llms:
     openai:
