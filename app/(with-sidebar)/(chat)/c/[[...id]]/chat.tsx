@@ -294,7 +294,7 @@ function ModelValiablesSetting({
                     setVariables((prev) => {
                       return prev.map((v: ChatModelVariable) => {
                         if (v.name === variable.name) {
-                          return { ...v, value: e.target.value };
+                          return { ...v, value: Number(e.target.value) };
                         }
                         return v;
                       });
