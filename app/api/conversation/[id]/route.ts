@@ -54,3 +54,27 @@ export async function POST(req: Request, { params: pathParams }: { params: { id:
 
   return Response.json({ ...result, id: pathParams.id });
 }
+
+export async function DELETE(req: Request, { params: pathParams }: { params: { id: string } }) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: pathParams.id, userId: userId },
+  });
+
+  if (!conversation) {
+    return Response.json({ error: 'Conversation not found' }, { status: 404 });
+  }
+
+  const result = await prisma.conversation.delete({
+    where: { id: pathParams.id },
+    include: { chat: { select: { id: true } } },
+  });
+
+  return Response.json({ ...result, id: pathParams.id });
+}
