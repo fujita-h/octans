@@ -1,4 +1,4 @@
-import { User } from '@auth/core';
+import { User } from '@auth/core/types';
 declare module '@auth/core/types' {
   interface User {
     uid: string;
