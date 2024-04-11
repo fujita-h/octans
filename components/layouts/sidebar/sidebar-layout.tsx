@@ -1,10 +1,11 @@
 'use client';
 
+import ConfirmDeleteConversationDialog from '@/components/dialogs/conversations/confirm-delete';
 import SettingDialog from '@/components/dialogs/settings';
 import type { ChatData } from '@/types/chat';
 import type { User } from '@auth/core/types';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, PencilSquareIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, EllipsisHorizontalIcon, PencilSquareIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Avatar from 'boring-avatars';
 import clsx from 'clsx/lite';
 import Link from 'next/link';
@@ -111,6 +112,8 @@ function SidebarContent({ user }: { user: User }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, data, isValidating]);
 
+  const [confrmToDeleteConversationId, setConfrmToDeleteConversationId] = useState<string | null>(null);
+
   return (
     <div className="flex grow flex-col gap-y-2 overflow-y-auto p-3 pr-1 bg-gray-100 dark:bg-black">
       <div className="flex-none pr-2">
@@ -135,11 +138,43 @@ function SidebarContent({ user }: { user: User }) {
                   <div className="text-xs text-gray-500 dark:text-neutral-400 truncate">{conversation.title}</div>
                 </Link>
               </div>
-              <div className="flex-none text-xs hidden group-hover:block"> ic </div>
+              <div className="flex-none">
+                <Menu>
+                  <Menu.Button className="text-xs flex">
+                    <div className="w-0 h-4" />
+                    <div className="hidden group-hover:flex">
+                      <EllipsisHorizontalIcon className="w-4 h-4" />
+                    </div>
+                  </Menu.Button>
+                  <Menu.Items className="absolute right-2 z-[5] mt-0.5 w-32 origin-top-right divide-y divide-gray-100 dark:divide-neutral-700 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black dark:ring-neutral-700 ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            type="button"
+                            onClick={() => setConfrmToDeleteConversationId(conversation.id)}
+                            className={clsx(
+                              active ? 'bg-gray-200/85 dark:bg-neutral-700 ' : '',
+                              'group flex items-center w-full px-4 py-1 text-sm rounded-md text-red-500 dark:text-red-100'
+                            )}
+                          >
+                            <TrashIcon className="mr-3 h-5 w-5" aria-hidden="true" />
+                            <span>削除</span>
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Menu>
+              </div>
             </div>
           );
         })}
         <div ref={ref} aria-hidden="true" />
+        <ConfirmDeleteConversationDialog
+          open={confrmToDeleteConversationId}
+          setOpen={setConfrmToDeleteConversationId}
+        />
       </div>
       <div className="flex-none">
         <ProfileButtonMenu user={user} />
