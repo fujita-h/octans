@@ -1,5 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 import { Fragment, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
@@ -11,6 +12,7 @@ export default function ConfirmDeleteConversationDialog({
   open: string | null;
   setOpen: (open: string | null) => void;
 }) {
+  const router = useRouter();
   const cancelButtonRef = useRef(null);
   const { mutate } = useSWRConfig();
   return (
@@ -70,6 +72,7 @@ export default function ConfirmDeleteConversationDialog({
                           }
                           setOpen(null);
                           mutate(unstable_serialize((index) => `/api/conversation?page=${index + 1}`));
+                          router.replace('/c');
                         });
                     }}
                   >
